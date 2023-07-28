@@ -1,0 +1,3 @@
+git add ~/Desktop/MILAB_VENV/PythonAlgorithm
+git commit -m "commit name"
+git push origin master
