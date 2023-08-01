@@ -37,6 +37,7 @@ for i in range(len(data), 0, -1):
     
     while((2 * j + 1 < i - 1) and (data[j] < data[2 * j + 1]) 
           or (2 * j + 2 < i - 1) and (data[j] < data[2 * j + 2])):
+        # 최댓값을 가장 상위 루트 노드로 올리는 알고리즘을 가지고 있음.
         if (2 * j + 2 == i - 1) or (data[2 * j + 1] > data[2 * j + 2]):
             data[j], data[2 * j + 1] = data[2 * j + 1], data[j]
             j = 2 * j + 1            

@@ -1,5 +1,5 @@
 import queue
-
+#파일 이름을 queue.py로 하면 안되니 주의할 것.
 q = queue.Queue()
 
 #Queue의 method -> put, get 두개만 외우면 됨!

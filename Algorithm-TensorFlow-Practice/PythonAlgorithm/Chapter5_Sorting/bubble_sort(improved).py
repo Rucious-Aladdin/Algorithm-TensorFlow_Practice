@@ -11,4 +11,7 @@ for i in range(len(data)):
             data[j], data[j + 1] = data[j + 1], data[j]
             change = True
 
+# 사전에 정렬된 자료에 대한 처리를 좀더 쉽게 함.
+# 이경우 복잡도가 O(n)으로 감소함.
+
 print(data)
