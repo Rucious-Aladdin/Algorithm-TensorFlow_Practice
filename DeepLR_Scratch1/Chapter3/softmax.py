@@ -1,12 +1,21 @@
 import numpy as np
 
-a = np.array([0.3, 2.9, 4.0])
+def softmax(a):
+    exp_a = np.exp(a)
+    sum_exp_a = np.sum(exp_a)
+    y = exp_a / sum_exp_a
+    return y
 
-exp_a = np.exp(a)
-print(exp_a)
+if __name__ == "__main__":
+    a = np.array([0.3, 2.9, 4.0])
 
-sum_exp_a = np.sum(exp_a)
-print(sum_exp_a)
+    exp_a = np.exp(a)
+    print(exp_a)
 
-y = exp_a / sum_exp_a
-print(y)
+    sum_exp_a = np.sum(exp_a)
+    print(sum_exp_a)
+
+    y = exp_a / sum_exp_a
+    print(y)
+    
+

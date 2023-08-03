@@ -19,3 +19,4 @@ if __name__ == "__main__":
     print(softmax(a))
     
 
+# 가장 값이큰 뉴런이 선택된 클래스가 되므로 현업에서는 softmax를 생략하기도 함.
