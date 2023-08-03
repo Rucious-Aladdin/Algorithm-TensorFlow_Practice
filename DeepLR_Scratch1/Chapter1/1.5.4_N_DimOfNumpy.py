@@ -12,3 +12,4 @@ print(np.matmul(A, B)) # matrix multiply
 
 print(A)
 print(A * 10)
+

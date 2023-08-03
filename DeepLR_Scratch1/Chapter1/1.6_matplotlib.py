@@ -16,6 +16,6 @@ plt.show()
 # 이미지 표시하기!!
 from matplotlib.image import imread
 
-img = imread("13.png")
-plt.imshow(img)
+img = imread("13.png") #imread하고, 
+plt.imshow(img) #imshow해야 보임.
 plt.show()

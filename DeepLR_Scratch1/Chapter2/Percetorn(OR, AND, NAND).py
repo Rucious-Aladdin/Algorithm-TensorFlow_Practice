@@ -36,4 +36,5 @@ for i in test:
     
 for i in test:
     print("OR: " + f"{(i[0], i[1])}" + " " + str(OR(i[0], i[1])))
-    
+
+#EZ
