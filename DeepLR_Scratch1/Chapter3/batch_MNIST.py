@@ -41,7 +41,7 @@ if __name__ == "__main__":
         x_batch = x[i:i+batch_size]
         y_batch = predict(network, x_batch)
         p = np.argmax(y_batch, axis = 1) # 확률이 가장 높은 원소 index
-        print(p==t[i:i+batch_size])
+        print(p==t[i:i+batch_size]) #boolean 배열
         accuracy_cnt += np.sum(p == t[i:i+batch_size])
     
     print("Accuracy: " + str(float(accuracy_cnt) / len(x)))
