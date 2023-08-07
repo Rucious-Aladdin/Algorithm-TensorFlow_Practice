@@ -22,4 +22,4 @@ a = gradient_descent(func, init_x=init_x, lr = 10.0, step_num=100) #발사 해�
 print(a)
 
 init_x = np.array([-3.0, 4.0])
-print(gradient_descent(func, init_x=init_x, lr = 1e-2, step_num=100))
+print(gradient_descent(func, init_x=init_x, lr = 1e-2, step_num=100)) # 값이 거의 변하지 않아 버림.
