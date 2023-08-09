@@ -18,17 +18,18 @@ class Convolution:
         out_h = int(1 + (H + 2 * self.pad - FH) // self.stride)
         out_w = int(1 + (W + 2 * self.pad - FW) // self.stride)
         
+        #shape Debugger
         col = im2col(x, FH, FW, self.stride, self.pad)
-        print(col.shape)
+        #print(col.shape)
         col_W = self.W.reshape(FN, -1).T  # 필터 전개
-        print(col_W.shape)
+        #print(col_W.shape)
         out = np.dot(col, col_W) + self.b
-        print(out.shape)
+        #print(out.shape)
         
         out = out.reshape(N, out_h, out_w, -1)
-        print(out.shape)
+        #print(out.shape)
         out = out.transpose(0, 3, 1, 2)
-        print(out.shape)
+        #print(out.shape)
         return out
     
 test_input = np.random.rand(10, 3, 7, 7)
