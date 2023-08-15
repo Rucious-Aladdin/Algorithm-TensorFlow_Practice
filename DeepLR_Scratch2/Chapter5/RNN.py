@@ -1,4 +1,6 @@
 import numpy as np
+import sys
+sys.path.append("C:\\Users\\Suseong Kim\\Desktop\\MILAB_VENV\\DeepLR_Scratch2")
 
 class RNN:
     def __init__(self, Wx, Wh, b):
@@ -65,6 +67,28 @@ class TimeRNN:
             self.layers.append(layer)
         
         return hs
+    
+    def backward(self, dhs):
+        Wx, _ , _ = self.params
+        N, T, _ = dhs.shape
+        D, _ = Wx.shape
+        
+        dxs = np.empty((N, T, D), dytpe="f")
+        dh = 0
+        grads = [0, 0, 0]
+        for t in reversed(range(T)):
+            layer = self.layers[t]
+            dx, dh = layer.backward(dhs[:, t, :] + dh)
+            dxs[:, t, :] = dx
+            
+            for i, grad in enumerate(layer.grads):
+                grads[i] += grad
+            
+        for i, grad in enumerate(grads):
+            self.grads[i][...] = grad
+        self.dh = dh
+        
+        return dxs
 
 if __name__ == "__main__":
     l1 = [1, 2, 3]
