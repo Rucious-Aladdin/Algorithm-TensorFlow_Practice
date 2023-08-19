@@ -20,7 +20,7 @@ input_data = np.random.randn(1000, 100)  # 1000개의 데이터
 node_num = 100  # 각 은닉층의 노드(뉴런) 수
 hidden_layer_size = 5  # 은닉층이 5개
 activations = {}  # 이곳에 활성화 결과를 저장
-exp = [3, 2]
+exp = [3, 1]
 
 '''
 앞쪽 index -> 0: N(0, 1), 1: N(0, 0.01), 2: Xavier, 3: HE
@@ -87,6 +87,7 @@ for i, a in activations.items():
     plt.title(str(i+1) + "-layer")
     if i != 0: plt.yticks([], [])
     # plt.xlim(0.1, 1)
-    # plt.ylim(0, 7000)
+    plt.ylim(0, 7000)
     plt.hist(a.flatten(), 30, range=(0,1))
+    print(np.var(a))
 plt.show()

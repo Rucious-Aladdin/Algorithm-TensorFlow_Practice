@@ -17,8 +17,8 @@ x_train = x_train[:300]
 t_train = t_train[:300]
 
 # weight decay（가중치 감쇠） 설정 =======================
-#weight_decay_lambda = 0 # weight decay를 사용하지 않을 경우
-weight_decay_lambda = 0.1
+weight_decay_lambda = 0 # weight decay를 사용하지 않을 경우
+#weight_decay_lambda = 0.1
 # ====================================================
 
 network = MultiLayerNet(input_size=784, hidden_size_list=[100, 100, 100, 100, 100, 100], output_size=10,
@@ -60,6 +60,10 @@ for i in range(1000000000):
 # 그래프 그리기==========
 markers = {'train': 'o', 'test': 's'}
 x = np.arange(max_epochs)
+if weight_decay_lambda == 0:
+    plt.title("Without Weight Decay(MNIST)")
+else:
+    plt.title("Weight Decay(MNIST)")
 plt.plot(x, train_acc_list, marker='o', label='train', markevery=10)
 plt.plot(x, test_acc_list, marker='s', label='test', markevery=10)
 plt.xlabel("epochs")

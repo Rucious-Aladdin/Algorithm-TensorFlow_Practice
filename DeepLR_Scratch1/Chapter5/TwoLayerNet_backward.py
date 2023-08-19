@@ -11,12 +11,13 @@ from common.gradient import numerical_gradient
 class TwoLayerNet:
     def __init__(self, input_size, hidden_size, output_size,
                  weight_init_std = 0.01):
+        zr = np.zeros
+        rn = np.random.randn
+        on = np.ones
         self.params = {}
-        self.params["W1"] = weight_init_std * \
-                            np.random.randn(input_size, hidden_size)
+        self.params["W1"] = on((input_size, hidden_size))
         self.params["b1"] = np.zeros(hidden_size)
-        self.params["W2"] = weight_init_std * \
-                            np.random.randn(hidden_size, output_size)
+        self.params["W2"] = on((hidden_size, output_size))
         self.params["b2"] = np.zeros(output_size)
         
         self.layers = OrderedDict()

@@ -164,3 +164,17 @@ class MultiLayerNetExtend:
                 grads['beta' + str(idx)] = self.layers['BatchNorm' + str(idx)].dbeta
 
         return grads
+    
+    def get_activations(self, x, train_flg=False):
+        activations = {}
+        for key, layer in self.layers.items():
+            if "Dropout" in key or "BatchNorm" in key:
+                x = layer.forward(x, train_flg)
+            elif "Activation_function" in key:
+                x = layer.forward(x)
+                activations[key] = x
+            else:
+                x = layer.forward(x)    
+            
+        
+        return activations
