@@ -38,6 +38,7 @@ def numerical_gradient(f, x):
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
         idx = it.multi_index
+        #print(idx)
         tmp_val = x[idx]
         x[idx] = float(tmp_val) + h
         fxh1 = f(x) # f(x+h)

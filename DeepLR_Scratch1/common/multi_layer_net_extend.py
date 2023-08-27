@@ -74,6 +74,7 @@ class MultiLayerNetExtend:
             scale = weight_init_std
             if str(weight_init_std).lower() in ('relu', 'he'):
                 scale = np.sqrt(2.0 / all_size_list[idx - 1])  # ReLUを使う場合に推奨される初期値
+                print(scale)
             elif str(weight_init_std).lower() in ('sigmoid', 'xavier'):
                 scale = np.sqrt(1.0 / all_size_list[idx - 1])  # sigmoidを使う場合に推奨される初期値
             self.params['W' + str(idx)] = scale * np.random.randn(all_size_list[idx-1], all_size_list[idx])

@@ -15,15 +15,16 @@ class EmbeddingDot:
 
     def forward(self, h, idx):
         target_W = self.embed.forward(idx)
+        #print("forward-targetW: " +str(target_W.shape))
         out = np.sum(target_W * h, axis=1)
-
+        #print("forward-out: " +str(out.shape))
         self.cache = (h, target_W)
+        #print("forward-h: " +str(h.shape))
         return out
 
     def backward(self, dout):
         h, target_W = self.cache
         dout = dout.reshape(dout.shape[0], 1)
-
         dtarget_W = dout * h
         self.embed.backward(dtarget_W)
         dh = dout * target_W
@@ -86,12 +87,13 @@ class NegativeSamplingLoss:
     def forward(self, h, target):
         batch_size = target.shape[0]
         negative_sample = self.sampler.get_negative_sample(target)
-
+        print("neg_sample: " + str(negative_sample.shape))
         # 긍정적 예 순전파
         score = self.embed_dot_layers[0].forward(h, target)
+        print("score: " + str(score.shape))
         correct_label = np.ones(batch_size, dtype=np.int32)
         loss = self.loss_layers[0].forward(score, correct_label)
-
+        print("loss: " + str(loss.shape))
         # 부정적 예 순전파
         negative_label = np.zeros(batch_size, dtype=np.int32)
         for i in range(self.sample_size):

@@ -116,9 +116,10 @@ class SigmoidWithLoss:
     def forward(self, x, t):
         self.t = t
         self.y = 1 / (1 + np.exp(-x))
-
+        #print("SigmoidWithLoss: " + str(self.t.shape) + " " + str(self.y.shape))
+        a=np.c_[1 - self.y, self.y]
         self.loss = cross_entropy_error(np.c_[1 - self.y, self.y], self.t)
-
+        #print("np.c_: " + str(a.shape))
         return self.loss
 
     def backward(self, dout=1):

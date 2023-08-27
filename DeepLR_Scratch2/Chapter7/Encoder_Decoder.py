@@ -55,8 +55,8 @@ class Decoder:
         self.params, self.grads = [], []
         
         for layer in (self.embed, self.lstm, self.affine):
-            self.params = layer.params
-            self.grads = layer.grads
+            self.params += layer.params
+            self.grads += layer.grads
             
     def forward(self, xs, h):
         self.lstm.set_state(h)

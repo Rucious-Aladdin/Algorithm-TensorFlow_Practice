@@ -15,7 +15,7 @@ train_loss_list = []
 train_acc_list = []
 test_acc_list = []
 
-iters_num = 10000
+iters_num = 100000
 train_size = x_train.shape[0]
 batch_size = 100
 learning_rate = 0.1
@@ -50,7 +50,7 @@ for i in range(iters_num):
         print("train acc, test acc | " + str(train_acc) + ", " + str(test_acc))
 
 x = range(len(train_acc_list))
-plt.plot(x, train_acc_list)
+plt.plot(x, train_acc_list, x, test_acc_list)
 plt.xlabel("epoch")
 plt.ylabel("accuracy")
 plt.title("MNIST accuracy")

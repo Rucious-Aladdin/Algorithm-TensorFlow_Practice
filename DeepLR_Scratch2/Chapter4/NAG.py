@@ -18,11 +18,14 @@ class NegativeSamplingLoss:
     def forward(self, h, target):
         batch_size = target.shape[0]
         negative_sample = self.sampler.get_negative_sample(target)
-        
+        print("neg_sample: " + str(negative_sample.shape))
+        # 긍정적 예 순전파
         score = self.embed_dot_layers[0].forward(h, target)
+        print("score: " + str(score.shape))
         correct_label = np.ones(batch_size, dtype=np.int32)
         loss = self.loss_layers[0].forward(score, correct_label)
-        
+        print("loss: " + str(loss.shape))
+        # 부정적 예 순전파
         negative_label = np.zeros(batch_size, dtype=np.int32)
         for i in range(self.sample_size):
             negative_target = negative_sample[:, i]

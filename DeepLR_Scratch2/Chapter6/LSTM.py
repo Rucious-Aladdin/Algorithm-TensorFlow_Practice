@@ -6,7 +6,8 @@ from common.functions import sigmoid
 class LSTM:
     def __init__(self, Wx, Wh, b):
         self.params = [Wx, Wh, b]
-        self.grads = [np.zeros_like(Wx), np.zeros_like(Wh), np.zeros_like(b)]
+        self.grads = [np.zeros_like(Wx), np.zeros_like(Wh), \
+            np.zeros_like(b)]
         self.cache = None
     
     def forward(self, x, h_prev, c_prev):
@@ -14,8 +15,7 @@ class LSTM:
         N, H = h_prev.shape
         
         A = np.matmul(x, Wx) + np.matmul(h_prev, Wh) + b
-        #4개분 전부를 저장한 그뭐냐.. 가중치 및 편향 행렬 (Wx, Wh, b)
-        
+
         f = A[:, :H]
         g = A[:, H:2*H]
         i = A[:, 2*H:3*H]
@@ -56,7 +56,8 @@ class TimeLSTM:
         
         for t in range(T):
             layer = LSTM(*self.params)
-            self.h, self.c = layer.forward(xs[:, t, :], self.h, self.c)
+            self.h, self.c = \
+                layer.forward(xs[:, t, :], self.h, self.c)
             hs[:, t, :] = self.h
             
             self.layers.append(layer)

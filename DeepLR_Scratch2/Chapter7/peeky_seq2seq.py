@@ -1,6 +1,6 @@
 # coding: utf-8
 import sys
-sys.path.append('..')
+sys.path.append("C:\\Users\\Suseong Kim\\Desktop\\MILAB_VENV\\DeepLR_Scratch2")
 from common.time_layers import *
 from Encoder_Decoder import Seq2Seq, Encoder
 

@@ -12,11 +12,13 @@ import numpy as np
 
 window_size = 5
 hidden_size = 100
-batch_size = 100
-max_epoch = 10
+batch_size = 50
+max_epoch = 2
 
 corpus, word_to_id, id_to_word = ptb.load_data("train")
 vocab_size = len(word_to_id)
+print(corpus.shape)
+print(len(word_to_id))
 
 contexts, target = create_contexts_target(corpus, window_size)
 if config.GPU:

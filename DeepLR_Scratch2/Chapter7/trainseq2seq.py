@@ -6,7 +6,7 @@ from dataset1 import sequence
 from common.optimizer import Adam
 from common.trainer import Trainer
 from common.util import eval_seq2seq
-from Encoder_Decoder import Seq2seq
+from Encoder_Decoder import Seq2Seq
 from peeky_seq2seq import PeekySeq2seq
 
 
@@ -15,22 +15,23 @@ from peeky_seq2seq import PeekySeq2seq
 char_to_id, id_to_char = sequence.get_vocab()
 
 # 입력 반전 여부 설정 =============================================
-is_reverse = True
+is_reverse = False
 if is_reverse:
     x_train, x_test = x_train[:, ::-1], x_test[:, ::-1]
 # ================================================================
 
 # 하이퍼파라미터 설정
 vocab_size = len(char_to_id)
+print(vocab_size)
 wordvec_size = 16
 hidden_size = 128
 batch_size = 128
-max_epoch =40
+max_epoch = 25
 max_grad = 5.0
 
 # 일반 혹은 엿보기(Peeky) 설정 =====================================
-#model = Seq2seq(vocab_size, wordvec_size, hidden_size)
-model = PeekySeq2seq(vocab_size, wordvec_size, hidden_size)
+model = Seq2Seq(vocab_size, wordvec_size, hidden_size)
+#model = PeekySeq2seq(vocab_size, wordvec_size, hidden_size)
 # ================================================================
 optimizer = Adam()
 trainer = Trainer(model, optimizer)
@@ -50,11 +51,11 @@ for epoch in range(max_epoch):
     acc = float(correct_num) / len(x_test)
     acc_list.append(acc)
     print('검증 정확도 %.3f%%' % (acc * 100))
-
+    
 # 그래프 그리기
 x = np.arange(len(acc_list))
 plt.plot(x, acc_list, marker='o')
-plt.xlabel('에폭')
-plt.ylabel('정확도')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
 plt.ylim(0, 1.0)
 plt.show()

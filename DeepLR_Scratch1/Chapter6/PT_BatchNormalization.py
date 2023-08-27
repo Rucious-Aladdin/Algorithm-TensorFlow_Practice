@@ -15,7 +15,7 @@ from common.optimizer import SGD, Adam
 x_train = x_train[:1000]
 t_train = t_train[:1000]
 
-max_epochs = 20
+max_epochs = 1000
 train_size = x_train.shape[0]
 batch_size = 100
 learning_rate = 0.01
@@ -59,7 +59,7 @@ def __train(weight_init_std):
 
 
 # 그래프 그리기==========
-weight_scale_list = np.logspace(0, -4, num=16)
+weight_scale_list = np.logspace(-4, -7, num=16)
 x = np.arange(max_epochs)
 
 for i, w in enumerate(weight_scale_list):
