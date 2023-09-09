@@ -3,20 +3,24 @@ import sys, os
 sys.path.append(os.pardir)  # 부모 디렉터리의 파일을 가져올 수 있도록 설정
 import numpy as np
 from common.optimizer import *
-
+import time
 class Trainer:
     """신경망 훈련을 대신 해주는 클래스
     """
-    def __init__(self, network, x_train, t_train, x_test, t_test,
+    def __init__(self, network, x_train, t_train, x_val, t_val, x_test, t_test,
                  epochs=20, mini_batch_size=100,
                  optimizer='SGD', optimizer_param={'lr':0.01}, 
                  evaluate_sample_num_per_epoch=None, verbose=True):
         self.network = network
         self.verbose = verbose
+        
         self.x_train = x_train
         self.t_train = t_train
+        self.x_val = x_val
+        self.t_val = t_val
         self.x_test = x_test
         self.t_test = t_test
+        
         self.epochs = epochs
         self.batch_size = mini_batch_size
         self.evaluate_sample_num_per_epoch = evaluate_sample_num_per_epoch
@@ -33,16 +37,19 @@ class Trainer:
         self.current_epoch = 0
         
         self.train_loss_list = []
+        self.val_loss_list = []
+        self.val_acc_list = []
         self.train_acc_list = []
-        self.test_acc_list = []
 
-    def train_step(self):
+    def train_step(self, time_list):
         batch_mask = np.random.choice(self.train_size, self.batch_size)
         x_batch = self.x_train[batch_mask]
         t_batch = self.t_train[batch_mask]
         
-        grads = self.network.gradient(x_batch, t_batch)
+        grads = self.network.gradient(x_batch, t_batch, time_list)
+        temp = time.perf_counter()
         self.optimizer.update(self.network.params, grads)
+        time_list[2] += (time.perf_counter() - temp)
         
         loss = self.network.loss(x_batch, t_batch)
         self.train_loss_list.append(loss)
@@ -52,23 +59,25 @@ class Trainer:
             self.current_epoch += 1
             
             x_train_sample, t_train_sample = self.x_train, self.t_train
-            x_test_sample, t_test_sample = self.x_test, self.t_test
+            x_val_sample, t_val_sample = self.x_val, self.t_val
             if not self.evaluate_sample_num_per_epoch is None:
                 t = self.evaluate_sample_num_per_epoch
                 x_train_sample, t_train_sample = self.x_train[:t], self.t_train[:t]
-                x_test_sample, t_test_sample = self.x_test[:t], self.t_test[:t]
+                x_val_sample, t_val_sample = self.x_val[:t], self.t_val[:t]
                 
+            val_loss = self.network.loss(self.x_val, self.t_val)
             train_acc = self.network.accuracy(x_train_sample, t_train_sample)
-            test_acc = self.network.accuracy(x_test_sample, t_test_sample)
+            val_acc = self.network.accuracy(x_val_sample, t_val_sample)
             self.train_acc_list.append(train_acc)
-            self.test_acc_list.append(test_acc)
+            self.val_acc_list.append(val_acc)
+            self.val_loss_list.append(val_loss)
 
-            if self.verbose: print("=== epoch:" + str(self.current_epoch) + ", train acc:" + str(train_acc) + ", test acc:" + str(test_acc) + " ===")
+            if self.verbose: print("=== epoch:" + str(self.current_epoch) + ", train acc:" + str(train_acc) + ", val acc:" + str(val_acc) + " ===")
         self.current_iter += 1
 
-    def train(self):
+    def train(self, time_list):
         for i in range(self.max_iter):
-            self.train_step()
+            self.train_step(time_list)
 
         test_acc = self.network.accuracy(self.x_test, self.t_test)
 

@@ -1,13 +1,13 @@
 import numpy as np
 import sys, os
-sys.path.append("C:\\Users\\Suseong Kim\\Desktop\\MILAB_VENV\\DeepLR_Scratch1\\Chapter4")
-sys.path.append("C:\\Users\\Suseong Kim\\Desktop\\MILAB_VENV\\DeepLR_Scratch1\\Chapter3")
 sys.path.append("C:\\Users\\Suseong Kim\\Desktop\\MILAB_VENV\\DeepLR_Scratch1\\dataset")
+sys.path.append("C:\\Users\\Suseong Kim\\Desktop\\MILAB_VENV\\DeepLR_Scratch1")
 from common.util import im2col
 from collections import OrderedDict
 from common.layers import *
 from common.gradient import numerical_gradient
 import pickle
+import time
 
 class SimpleConvNet:
     def __init__(self, input_dim = (1, 28, 28),
@@ -62,17 +62,24 @@ class SimpleConvNet:
         y = self.predict(x)
         return self.last_layer.forward(y, t)
     
-    def gradient(self, x, t):
+    def gradient(self, x, t, time_list=None):
+        temp = time.perf_counter()
         self.loss(x, t)
+        time_list[0] += (time.perf_counter() - temp)
         
+        temp = time.perf_counter()
         dout = 1
         dout = self.last_layer.backward(dout)
-        
+        #print("SoftmaxWithLossLayer Bacpropagation: " + str(time.perf_counter() - loss_time))
+        #time_list[0] += (time.perf_counter() - loss_time)
         layers = list(self.layers.values())
         layers.reverse()
-        for layer in layers:
+        for i, layer in enumerate(layers):
+            #temp = time.perf_counter()
             dout = layer.backward(dout)
-            
+            #time_list[i+1] += (time.perf_counter() - temp)
+        time_list[1] += (time.perf_counter() - temp)
+        
         grads = {}
         grads["W1"] = self.layers["Conv1"].dW
         grads["b1"] = self.layers["Conv1"].db
@@ -136,3 +143,7 @@ class SimpleConvNet:
             grads['b' + str(idx)] = numerical_gradient(loss_w, self.params['b' + str(idx)])
 
         return grads
+    
+    def save_model(model, filename):
+        with open(filename, 'wb') as file:
+            pickle.dump(model, file)

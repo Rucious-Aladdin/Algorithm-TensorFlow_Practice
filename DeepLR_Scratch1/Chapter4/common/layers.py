@@ -2,7 +2,7 @@
 import numpy as np
 from common.functions import *
 from common.util import im2col, col2im
-
+import time
 
 class Relu:
     def __init__(self):
@@ -16,9 +16,10 @@ class Relu:
         return out
 
     def backward(self, dout):
+        #Relu_time = time.perf_counter()
         dout[self.mask] = 0
         dx = dout
-
+        #print("Relu backward: " + str(time.perf_counter() - Relu_time))
         return dx
 
 
@@ -59,11 +60,13 @@ class Affine:
         return out
 
     def backward(self, dout):
+        #Affine_time = time.perf_counter()
         dx = np.dot(dout, self.W.T)
         self.dW = np.dot(self.x.T, dout)
         self.db = np.sum(dout, axis=0)
         
         dx = dx.reshape(*self.original_x_shape)  # 입력 데이터 모양 변경(텐서 대응)
+        #print("Affine Backward: " + str(time.perf_counter() - Affine_time))
         return dx
 
 
@@ -226,17 +229,38 @@ class Convolution:
 
         return out
 
-    def backward(self, dout):
+    def backward(self, dout, time_list=None):
+        #ConvolutionLayer = time.perf_counter()
+
+        # 1. dout matrix를 reshaping하는 과정
         FN, C, FH, FW = self.W.shape
+        
+        #temp = time.perf_counter()
         dout = dout.transpose(0,2,3,1).reshape(-1, FN)
-
+        #time_list[1] += (time.perf_counter() - temp)
+        
+        # 2. Convolution Layer의 backward 행렬곱
+        #temp = time.perf_counter()
         self.db = np.sum(dout, axis=0)
-        self.dW = np.dot(self.col.T, dout)
+        self.dW = np.dot(self.col.T, dout)    
+        #time_list[0] += (time.perf_counter() - temp)
+
+        #temp = time.perf_counter()    
         self.dW = self.dW.transpose(1, 0).reshape(FN, C, FH, FW)
-
+        #time_list[1] += (time.perf_counter() - temp)
+        
+        
+        # 3. dcol행렬 계산
+        #temp = time.perf_counter()
         dcol = np.dot(dout, self.col_W.T)
+        #time_list[0] += (time.perf_counter() - temp)
+        
+        # 4. col2im과정
+        #temp = time.perf_counter()
         dx = col2im(dcol, self.x.shape, FH, FW, self.stride, self.pad)
-
+        #time_list[2] += (time.perf_counter() - temp)
+        
+        #print("ConvolutionLayer: " + str(time.perf_counter() - ConvolutionLayer))
         return dx
 
 
@@ -268,14 +292,25 @@ class Pooling:
         return out
 
     def backward(self, dout):
+        #Pooling_time = time.perf_counter()
         dout = dout.transpose(0, 2, 3, 1)
-        
         pool_size = self.pool_h * self.pool_w
         dmax = np.zeros((dout.size, pool_size))
+                
+        # 1. dout matrix를 flatten후 reshaping 하는 과정
+        #temp = time.perf_counter()
         dmax[np.arange(self.arg_max.size), self.arg_max.flatten()] = dout.flatten()
+        #time_list[0] += (time.perf_counter() - temp)
+        
+        #temp = time.perf_counter()
         dmax = dmax.reshape(dout.shape + (pool_size,)) 
-        
         dcol = dmax.reshape(dmax.shape[0] * dmax.shape[1] * dmax.shape[2], -1)
-        dx = col2im(dcol, self.x.shape, self.pool_h, self.pool_w, self.stride, self.pad)
+        #time_list[1] += (time.perf_counter() - temp)
         
+        # 2. dcol matrix의 col2im과정(2차원 matrix -> 4차원 matrix)
+        #temp = time.perf_counter()
+        dx = col2im(dcol, self.x.shape, self.pool_h, self.pool_w, self.stride, self.pad)
+        #time_list[2] += (time.perf_counter() - temp)
+        
+        #print("Pooling time: " + str(time.perf_counter() - Pooling_time))
         return dx

@@ -7,7 +7,8 @@ from softmax import softmax
 from collections import OrderedDict
 from common.layers import *
 from common.gradient import numerical_gradient
-
+import pickle
+import time
 class TwoLayerNet:
     def __init__(self, input_size, hidden_size, output_size,
                  weight_init_std = 0.01):
@@ -57,14 +58,18 @@ class TwoLayerNet:
         
         return grads
         
-    def gradient(self, x, t):
+    def gradient(self, x, t, time_list):
         self.loss(x, t)
         dout = 1
+        temp = time.perf_counter()
         dout = self.lastLayer.backward(dout)
+        time_list[0] += (time.perf_counter() - temp)
         layers = list(self.layers.values())
         layers.reverse()
-        for layer in layers:
+        for i, layer in enumerate(layers):
+            temp = time.perf_counter()
             dout = layer.backward(dout)
+            time_list[i+1] += (time.perf_counter() - temp)
         
         grads = {}
         grads["W1"] = self.layers["Affine1"].dW
@@ -73,3 +78,13 @@ class TwoLayerNet:
         grads["b2"] = self.layers["Affine2"].db
         
         return grads
+    
+    def save_model(model, filename):
+        with open(filename, 'wb') as file:
+            pickle.dump(model, file)
+
+    # 모델 로드
+    def load_model(filename):
+        with open(filename, 'rb') as file:
+            model = pickle.load(file)
+        return model

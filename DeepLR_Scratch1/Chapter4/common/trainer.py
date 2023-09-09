@@ -3,7 +3,7 @@ import sys, os
 sys.path.append(os.pardir)  # 부모 디렉터리의 파일을 가져올 수 있도록 설정
 import numpy as np
 from common.optimizer import *
-
+import time
 class Trainer:
     """신경망 훈련을 대신 해주는 클래스
     """
@@ -36,14 +36,15 @@ class Trainer:
         self.train_acc_list = []
         self.test_acc_list = []
 
-    def train_step(self):
+    def train_step(self, time_list):
         batch_mask = np.random.choice(self.train_size, self.batch_size)
         x_batch = self.x_train[batch_mask]
         t_batch = self.t_train[batch_mask]
         
-        grads = self.network.gradient(x_batch, t_batch)
+        grads = self.network.gradient(x_batch, t_batch, time_list)
+        #update = time.perf_counter()
         self.optimizer.update(self.network.params, grads)
-        
+        #print("Update Time: " + str(time.perf_counter() - update))
         loss = self.network.loss(x_batch, t_batch)
         self.train_loss_list.append(loss)
         if self.verbose: print("train loss:" + str(loss))
@@ -66,9 +67,9 @@ class Trainer:
             if self.verbose: print("=== epoch:" + str(self.current_epoch) + ", train acc:" + str(train_acc) + ", test acc:" + str(test_acc) + " ===")
         self.current_iter += 1
 
-    def train(self):
+    def train(self, time_list):
         for i in range(self.max_iter):
-            self.train_step()
+            self.train_step(time_list)
 
         test_acc = self.network.accuracy(self.x_test, self.t_test)
 

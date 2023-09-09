@@ -9,21 +9,24 @@ from common.util import clip_grads
 
 
 class Trainer:
-    def __init__(self, model, optimizer):
+    def __init__(self, model, optimizer, patience_check=3):
         self.model = model
         self.optimizer = optimizer
         self.loss_list = []
+        self.val_loss_list = []
         self.eval_interval = None
         self.current_epoch = 0
+        self.patience_check = patience_check
 
-    def fit(self, x, t, max_epoch=10, batch_size=32, max_grad=None, eval_interval=20):
+    def fit(self, x, t, x_val, t_val, max_epoch=10, batch_size=32, max_grad=None, eval_interval=20):
         data_size = len(x)
         max_iters = data_size // batch_size
         self.eval_interval = eval_interval
         model, optimizer = self.model, self.optimizer
         total_loss = 0
         loss_count = 0
-
+        patience_check = 0
+        
         start_time = time.time()
         for epoch in range(max_epoch):
             # 뒤섞기
@@ -45,25 +48,38 @@ class Trainer:
                 optimizer.update(params, grads)
                 total_loss += loss
                 loss_count += 1
-
+                print("train loss: " + str(loss) + ", iterations: " + str(iters))
                 # 평가
                 if (eval_interval is not None) and (iters % eval_interval) == 0:
+                    val_loss = model.forward(x_val, t_val)
                     avg_loss = total_loss / loss_count
                     elapsed_time = time.time() - start_time
-                    print('| 에폭 %d |  반복 %d / %d | 시간 %d[s] | 손실 %.2f'
-                          % (self.current_epoch + 1, iters + 1, max_iters, elapsed_time, avg_loss))
+                    print('| 에폭 %d |  반복 %d / %d | 시간 %d[s] | train 손실 %.2f | Val 손실 %.2f'
+                          % (self.current_epoch + 1, iters + 1, max_iters, elapsed_time, avg_loss, val_loss))
                     self.loss_list.append(float(avg_loss))
+                    self.val_loss_list.append(float(val_loss))
                     total_loss, loss_count = 0, 0
+                    
+                    if len(self.val_loss_list) >= 2:
+                        if self.val_loss_list[-1] > self.val_loss_list[-2]:
+                            patience_check += 1
+                            if self.patience_check == patience_check:
+                                break
 
             self.current_epoch += 1
+            if self.patience_check == patience_check:
+                break
 
     def plot(self, ylim=None):
         x = numpy.arange(len(self.loss_list))
         if ylim is not None:
             plt.ylim(*ylim)
-        plt.plot(x, self.loss_list, label='train')
-        plt.xlabel('반복 (x' + str(self.eval_interval) + ')')
-        plt.ylabel('손실')
+        plt.plot(x, self.loss_list, label='train loss')
+        plt.plot(x, self.val_loss_list, label="val. loss")
+        plt.legend(loc="upper right")
+        #plt.ylim(0, 0.5)
+        plt.xlabel('iterations (x' + str(self.eval_interval) + ')')
+        plt.ylabel('Loss')
         plt.show()
 
 

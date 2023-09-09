@@ -2,7 +2,7 @@
 import numpy as np
 from common.functions import *
 from common.util import im2col, col2im
-
+import time
 
 class Relu:
     def __init__(self):
@@ -59,9 +59,18 @@ class Affine:
         return out
 
     def backward(self, dout):
+        #temp = time.perf_counter()
         dx = np.dot(dout, self.W.T)
+        #print(dout.shape, self.W.T.shape)
+        #print(time.perf_counter() - temp)
+        
+        #temp = time.perf_counter()
         self.dW = np.dot(self.x.T, dout)
+        #print(self.x.T.shape, dout.shape)
+        #print(time.perf_counter() - temp)
+        #temp = time.perf_counter()
         self.db = np.sum(dout, axis=0)
+        #print(time.perf_counter() - temp)
         
         dx = dx.reshape(*self.original_x_shape)  # 입력 데이터 모양 변경(텐서 대응)
         return dx
@@ -196,7 +205,7 @@ class BatchNormalization:
 
 
 class Convolution:
-    def __init__(self, W, b, stride=1, pad=0):
+    def __init__(self, W, b, stride=1, pad=0, firstLayer=False):
         self.W = W
         self.b = b
         self.stride = stride
@@ -206,7 +215,7 @@ class Convolution:
         self.x = None   
         self.col = None
         self.col_W = None
-        
+        self.firstLayer = firstLayer
         # 가중치와 편향 매개변수의 기울기
         self.dW = None
         self.db = None
@@ -233,14 +242,22 @@ class Convolution:
         FN, C, FH, FW = self.W.shape
         dout = dout.transpose(0,2,3,1).reshape(-1, FN)
 
+        #temp = time.perf_counter()
         self.db = np.sum(dout, axis=0)
         self.dW = np.dot(self.col.T, dout)
+        #print(self.col.T.shape, dout.shape)
+        #print(time.perf_counter() - temp)
         self.dW = self.dW.transpose(1, 0).reshape(FN, C, FH, FW)
 
-        dcol = np.dot(dout, self.col_W.T)
-        dx = col2im(dcol, self.x.shape, FH, FW, self.stride, self.pad)
+        if self.firstLayer == False:
+            #temp = time.perf_counter()
+            dcol = np.dot(dout, self.col_W.T)
+            #print(dout.shape, self.col_W.T.shape)
+            #print(time.perf_counter() - temp)
+            dx = col2im(dcol, self.x.shape, FH, FW, self.stride, self.pad)
+            return dx
 
-        return dx
+        return None
 
 
 class Pooling:
